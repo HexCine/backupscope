@@ -1,0 +1,6 @@
+{"struct_type": "snapshot", "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "time": "2026-09-22T12:00:00Z", "hostname": "demo-server", "tags": ["daily"]}
+{"struct_type": "node", "path": "/backup", "type": "dir", "size": 0, "mtime": "2026-09-22T11:55:00Z"}
+{"struct_type": "node", "path": "/backup/photos", "type": "dir", "size": 0, "mtime": "2026-09-22T11:55:00Z"}
+{"struct_type": "node", "path": "/backup/photos/image.jpg", "type": "file", "size": 42000, "mtime": "2026-09-22T11:55:00Z"}
+{"struct_type": "node", "path": "/backup/dumps", "type": "dir", "size": 0, "mtime": "2026-09-22T11:55:00Z"}
+{"struct_type": "node", "path": "/backup/dumps/postgres.sql", "type": "file", "size": 8000, "mtime": "2026-09-18T12:00:00Z"}

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling==1.32.4"]
+build-backend = "hatchling.build"
+
+[project]
+name = "backupscope"
+version = "0.1.0"
+description = "Find Docker mount paths missing from a fresh restic snapshot."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "BackupScope contributors"}]
+dependencies = []
+
+[project.scripts]
+backupscope = "backupscope.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/backupscope"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/tests", "/scripts", "/examples", "/docs", "/.github", "/README.md", "/LICENSE", "/CONTRIBUTING.md", "/SECURITY.md", "/CHANGELOG.md", "/pyproject.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
