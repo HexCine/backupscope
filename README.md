@@ -1,5 +1,10 @@
 # BackupScope
 
+**[Start here: visual guide EN/RU](https://github.com/HexCine/backupscope/releases/download/v0.2.1/start.html)** · [Русский: первый запуск](docs/QUICKSTART.ru.md)
+
+Download `start.html` and open it in your browser for installation, a failing demo,
+a passing comparison and next steps. Examples are synthetic and run locally.
+
 [![CI](https://github.com/HexCine/backupscope/actions/workflows/ci.yml/badge.svg)](https://github.com/HexCine/backupscope/actions/workflows/ci.yml)
 
 **Find Docker data paths missing from your restic snapshot before you need them.**
@@ -11,7 +16,7 @@ file listing and an explicit path-presence policy. It works alongside your
 existing backup tool, without a server, account or paid API. Check an exported
 listing offline, or capture a complete listing directly from your configured restic.
 
-Version **0.2.0**, an early release seeking real-world workflow feedback.
+Version **0.2.1**, an early release seeking real-world workflow feedback.
 No claim of universal backup coverage or production validation.
 
 ## A reproducible reason to use it

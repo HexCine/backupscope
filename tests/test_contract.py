@@ -36,6 +36,9 @@ def test_missing_mount_and_old_dump_remain_distinct(case):
     statuses = {row["resource"]: row["status"] for row in result["rows"]}
     assert statuses["bind:/srv/documents"] == "missing"
     assert statuses["volume:postgres"] == "failed"  # Present, but stale.
+    rendered = html_report(result)
+    assert "backup selection" in rendered and "dump-generation job" in rendered
+    assert "Evidence needs attention" in rendered and "Evidence is incomplete" not in rendered
 
 
 def test_read_only_data_is_still_required(case):
@@ -221,6 +224,8 @@ def test_unsupported_mount_has_renderable_unknown(case):
     case[0]["containers"][0]["mounts"].append({"type":"future-mount","source":"opaque","destination":"/special","read_only":True})
     report = check(case)
     assert report["exit_code"] == 2 and 'BSU05' in html_report(report)
+    assert "Evidence is incomplete" in html_report(report)
+    assert "outside the supported model" in html_report(report)
 
 
 def test_ephemeral_mount_is_visible(case):

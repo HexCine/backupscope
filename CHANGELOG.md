@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 — 2026-09-22
+
+- Add a responsive, offline EN/RU first-run guide with copyable demo commands.
+- Add a Russian quickstart, expected outcomes and troubleshooting links in the README.
+- HTML reports distinguish incomplete evidence and suggest the next review action for each diagnostic.
+
+
 ## 0.2.0 — 2026-09-22
 
 - `verify` checks a snapshot directly through installed restic, with automatic
