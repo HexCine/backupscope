@@ -1,7 +1,8 @@
 # Validation record — 0.1.0
 
-Executed locally on Windows on **2026-09-22**. This is an initial implementation,
-not a production deployment report. Fixtures contain generated data only.
+Executed locally on Windows and on GitHub Actions on **2026-09-22**. This is an
+initial implementation, not a production deployment report. Fixtures contain
+generated data only.
 
 | Check | Observed result |
 | --- | --- |
@@ -14,7 +15,27 @@ not a production deployment report. Fixtures contain generated data only.
 | Workflow static validation, actionlint 1.7.12 | Passed |
 | HTML report, desktop and 390 px mobile viewport | Visually inspected; no page overflow; JSON disclosure works |
 | Real Docker discovery locally | Not run: Docker daemon unavailable |
-| GitHub Actions OS matrix | Configured; no hosted run is claimed in this record |
+| GitHub Actions OS matrix | Six jobs passed; 79 tests and offline wheel checks in every job |
+| Linux integration on GitHub Actions | Real restic backup/check/restore and real Docker discovery passed |
+
+## Hosted execution
+
+[CI run 35713863227](https://github.com/HexCine/backupscope/actions/runs/35713863227)
+passed all seven jobs at source commit
+`79d0f668c8d5bddbd8e7b69aa59fa9bb206fe696`.
+
+| Runner | Python versions observed in logs | Result per version |
+| --- | --- | --- |
+| Ubuntu | 3.11.16, 3.14.7 | 79 tests; build; clean offline wheel installation passed |
+| Windows | 3.11.9, 3.14.7 | 79 tests; build; clean offline wheel installation passed |
+| macOS | 3.11.9, 3.14.7 | 79 tests; build; clean offline wheel installation passed |
+
+The separate Ubuntu integration job used restic 0.19.1 (linux/amd64) and
+confirmed excluded-path exit 1, complete-path exit 0 and matching restored
+bytes. Its Docker test reported `docker_discovery: passed`,
+`container_started: false`, `read_only_mount: true` against a live daemon.
+The restic scenario still uses a synthetic inventory; real Docker collection
+is exercised separately.
 
 The 79-test suite covers missing/new/read-only mounts, shared volume consumers,
 path boundaries, empty and special nodes, required-file age and size, global
@@ -60,11 +81,12 @@ Its downloaded archive SHA-256 was checked against release metadata:
 `da948ad707ed690426473aaba2046cd61f8f90f6f0e7dab6be0d5796531de67d`.
 The binary is not bundled in BackupScope.
 
-## Reproduce remaining platform checks
+## Reproduce platform checks
 
 CI defines six Python/OS combinations (3.11 and 3.14 on Linux, Windows and
 macOS), clean wheel verification, a checksummed restic integration and Docker
-discovery on Linux. A configured workflow is not evidence of successful runs.
+discovery on Linux. The linked run above records execution of those jobs;
+later changes should be assessed against their own commit's CI result.
 
 `scripts/docker_integration.py` needs a running Linux Docker daemon. It creates
 its own uniquely named, never-started Alpine container with a temporary read-only
@@ -73,7 +95,8 @@ It may pull the official Alpine image. It does not inspect arbitrary containers.
 
 ## Limits of these results
 
-No real-user backup was inspected; no user interviews, load testing on a large
-production repository, Linux/macOS local execution or live Docker integration
-is claimed. Path presence is not file completeness, integrity, database
-consistency or proof of recoverability. See [POLICY.md](POLICY.md).
+No real-user backup was inspected; no user interviews or load testing on a
+large production repository is claimed. Linux/macOS and live Docker results
+come from hosted CI, not this Windows workstation. Path presence is not file
+completeness, integrity, database consistency or proof of recoverability.
+See [POLICY.md](POLICY.md).

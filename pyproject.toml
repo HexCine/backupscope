@@ -13,6 +13,11 @@ license-files = ["LICENSE"]
 authors = [{name = "BackupScope contributors"}]
 dependencies = []
 
+[project.urls]
+Repository = "https://github.com/HexCine/backupscope"
+Issues = "https://github.com/HexCine/backupscope/issues"
+Documentation = "https://github.com/HexCine/backupscope/blob/main/README.md"
+
 [project.scripts]
 backupscope = "backupscope.cli:main"
 

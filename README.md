@@ -1,5 +1,7 @@
 # BackupScope
 
+[![CI](https://github.com/HexCine/backupscope/actions/workflows/ci.yml/badge.svg)](https://github.com/HexCine/backupscope/actions/workflows/ci.yml)
+
 **Find Docker data paths missing from your restic snapshot before you need them.**
 
 You add a volume, move an application to a bind mount, or rename a stack. The
@@ -26,6 +28,8 @@ you whether every data source you intended to include was selected.
 Python 3.11+; no runtime dependencies. From this source directory:
 
 ```sh
+git clone https://github.com/HexCine/backupscope.git
+cd backupscope
 python -m pip install .
 backupscope check --inventory examples/inventory.json --snapshot examples/missing.jsonl --policy examples/policy.json --at 2026-09-22T13:00:00Z
 ```
