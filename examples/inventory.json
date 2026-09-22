@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "host": "demo-server",
+  "captured_at": "2026-09-22T12:00:00Z",
+  "containers": [
+    {
+      "name": "photos",
+      "mounts": [
+        {
+          "type": "volume",
+          "source": "/var/lib/docker/volumes/photos/_data",
+          "destination": "/photos",
+          "read_only": false,
+          "volume": "photos"
+        },
+        {
+          "type": "bind",
+          "source": "/srv/documents",
+          "destination": "/documents",
+          "read_only": true
+        }
+      ]
+    },
+    {
+      "name": "database",
+      "mounts": [
+        {
+          "type": "volume",
+          "source": "/var/lib/docker/volumes/postgres/_data",
+          "destination": "/var/lib/postgresql/data",
+          "read_only": false,
+          "volume": "postgres"
+        }
+      ]
+    },
+    {
+      "name": "cache",
+      "mounts": [
+        {
+          "type": "volume",
+          "source": "/var/lib/docker/volumes/cache/_data",
+          "destination": "/cache",
+          "read_only": false,
+          "volume": "cache"
+        }
+      ]
+    }
+  ]
+}

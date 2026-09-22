@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "host": "demo-server",
+  "max_age_hours": 24,
+  "max_inventory_age_hours": 24,
+  "required_tags": [
+    "daily"
+  ],
+  "mappings": [
+    {
+      "type": "volume",
+      "source": "photos",
+      "snapshot_path": "/backup/photos"
+    },
+    {
+      "type": "bind",
+      "source": "/srv/documents",
+      "snapshot_path": "/backup/documents"
+    },
+    {
+      "type": "volume",
+      "source": "postgres",
+      "snapshot_path": "/backup/dumps",
+      "required_files": [
+        {
+          "path": "postgres.sql",
+          "max_age_hours": 24,
+          "min_bytes": 100
+        }
+      ]
+    }
+  ],
+  "ignores": [
+    {
+      "type": "volume",
+      "source": "cache",
+      "reason": "Disposable application cache; rebuilt from the database",
+      "expires_at": "2027-01-01T00:00:00Z"
+    }
+  ]
+}
