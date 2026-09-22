@@ -1,4 +1,34 @@
-# Validation record — 0.1.0
+# Validation records
+
+## 0.2.0 — direct restic verification
+
+Executed on Windows on **2026-09-22**, using generated fixtures only:
+
+| Check | Observed result |
+| --- | --- |
+| Unit, subprocess and CLI suite, Python 3.14.5 | 118 passed |
+| Same suite, Python 3.11.15 | 118 passed |
+| Real restic 0.19.1, explicit snapshot verification | Missing path exit 1; complete path exit 0 |
+| Real latest selection | Correct host and all required tags, despite newer nonmatching snapshots and RESTIC_HOST default |
+| Wrong password / no matching snapshot | Exit 2; no report; password not exposed |
+| Restore fixture | Restored bytes match original generated file |
+
+The 39 new cases use real child processes for valid output followed by nonzero
+exits, stalls before/after stdout closes, stderr floods and bounded stdout.
+They also cover full-ID matching, CLI failure output, safe argument construction,
+configuration validation, tag ambiguity and report capture provenance. Restic
+selection and authentication are exercised against the actual binary, not mocks.
+
+All direct captures use `--no-lock --no-cache`; the real test does not inspect
+user repositories. Repository integrity and restore assertions from the 0.1.0
+experiment remain in the expanded script. Backend helper descendants, very
+large production repositories and concurrent prune are not tested.
+
+For hosted results of this version, inspect the CI run attached to the release
+commit, linked in the release's `verification.json`. The historical run below
+belongs to 0.1.0 and does not validate 0.2.0.
+
+## 0.1.0 — original release
 
 Executed locally on Windows and on GitHub Actions on **2026-09-22**. This is an
 initial implementation, not a production deployment report. Fixtures contain

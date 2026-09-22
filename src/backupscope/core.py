@@ -169,6 +169,7 @@ def analyze(inventory, catalog, policy, now=None):
     return {
         "schema_version": 1, "tool_version": __version__, "checked_at": moment.isoformat().replace("+00:00", "Z"),
         "snapshot": snapshot, "snapshot_age_hours": snapshot_age, "inventory_age_hours": inventory_age,
+        "capture": catalog.get("capture", {"method": "supplied_listing", "completion_confirmed": False}),
         "rows": rows, "findings": findings, "unknowns": unknowns,
         "summary": {"mounts": len(rows), "statuses": counts, "findings": len(findings), "unknowns": len(unknowns)},
         "exit_code": 2 if unknowns else 1 if findings else 0,

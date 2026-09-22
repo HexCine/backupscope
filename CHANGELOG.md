@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.0 — 2026-09-22
+
+- `verify` checks a snapshot directly through installed restic, with automatic
+  selection by policy host and all required tags, or a full explicit snapshot ID.
+- Bounded private capture, timeout, no-cache/no-lock reads, and discarded partial
+  output on every nonzero restic exit. Existing output files remain protected.
+- Text, JSON and HTML reports distinguish observed capture completion from a
+  supplied offline listing. Offline policy and exit-code behavior is preserved.
+- Real child-process regression tests for errors, stalls and output floods;
+  restic integration exercises host/tag selection and authentication failures.
+- Direct verification and automation guide; wheel verifier follows package version.
+
 ## 0.1.0 — 2026-09-22
 
 - Redacted read-only Docker mount inventory and explicit saved-export timestamp.

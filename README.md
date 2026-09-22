@@ -8,9 +8,10 @@ You add a volume, move an application to a bind mount, or rename a stack. The
 backup job still succeeds. The new data may not be in the backup at all.
 BackupScope compares a redacted Docker mount inventory with an actual restic
 file listing and an explicit path-presence policy. It works alongside your
-existing backup tool, offline, without a server, account or paid API.
+existing backup tool, without a server, account or paid API. Check an exported
+listing offline, or capture a complete listing directly from your configured restic.
 
-Version **0.1.0**, an early release seeking real-world workflow feedback.
+Version **0.2.0**, an early release seeking real-world workflow feedback.
 No claim of universal backup coverage or production validation.
 
 ## A reproducible reason to use it
@@ -65,24 +66,47 @@ commands and Docker labels are not included in the exported inventory.
 restic runs in a container, or if a database volume maps to a logical dump.
 Automatic fallback is the exact host source path, never a guessed volume name.
 
-Export one full snapshot listing using your existing restic authentication:
+With restic installed and your existing repository/password environment configured:
+
+```sh
+backupscope verify --inventory inventory.local.json --policy policy.local.json --latest --format html --output coverage.html
+```
+
+`verify` selects the latest snapshot for the policy's host and **all** required
+tags. It waits for the full, unfiltered `restic ls --json` command to exit 0
+before checking any paths. A nonzero exit, timeout, malformed listing or size
+limit produces exit **2** without a report. A valid partial JSON prefix from a
+failed command is discarded. The report records the selected full snapshot ID
+and whether BackupScope observed successful capture completion.
+
+For a reproducible incident report, replace `--latest` with
+`--snapshot-id FULL_64_CHARACTER_ID`. No short IDs or `ID:/subdirectory` filters
+are accepted. With an explicit ID, host and tags are still checked against the
+policy. Tags containing commas or surrounding whitespace require an explicit
+ID because restic's tag filter cannot preserve those exact values.
+
+Credentials stay in your existing restic configuration, for example
+`RESTIC_REPOSITORY` and `RESTIC_PASSWORD_FILE`. Use `--restic /path/to/restic`
+if needed. The default restic timeout is 300 seconds; `--timeout 600` changes it
+(maximum 3600). See [direct verification and automation](docs/VERIFY.md).
+
+Offline `check` remains available if repository access belongs on another host:
 
 ```sh
 restic ls --json --host homebox --tag daily latest > snapshot.local.jsonl
+# Continue only after confirming that restic exited 0.
 backupscope check --inventory inventory.local.json --snapshot snapshot.local.jsonl --policy policy.local.json --format html --output coverage.html
 ```
 
-**Only use the listing if restic exited 0.** Do not filter its paths, splice
-listings, or evaluate a partially written file. For monitoring, finish the
-export into a temporary file, check the exit status, then replace your local
-listing atomically before invoking BackupScope. A listing is supplied evidence,
-not an authenticated or signed attestation. Prefer a full snapshot ID instead
-of `latest` for a reproducible incident report.
+Do not filter paths, splice listings, or evaluate a partially written file.
+Offline reports explicitly say that restic completion was not observed by
+BackupScope. A supplied listing is not an authenticated or signed attestation.
 
 BackupScope itself never reads backup file contents, performs a restore,
-stops containers, or mutates a backup repository. The restic export accesses
-whichever repository you have already configured. On PowerShell 7, redirecting
-native stdout preserves suitable UTF-8 output; ensure UTF-8 on other shells.
+stops containers, or mutates a backup repository. `verify` runs restic with
+`--no-lock --no-cache`; repository access and authentication belong to restic.
+Direct capture preserves bytes without shell redirection. For manual exports,
+use a shell that preserves native stdout as UTF-8.
 
 ## What it checks
 
@@ -128,7 +152,7 @@ server/agent platform with a coverage-map roadmap; this idea is not unique.
 [Databasus](https://github.com/databasus/databasus) is a stronger fit if you need
 database backup scheduling and automated restore verification.
 
-BackupScope's narrow choice is a small, read-only checker over exported evidence
+BackupScope's narrow choice is a small, read-only checker over snapshot listings
 with no migration to a new backup platform. If this proves more useful as an
 integration in an existing project, prefer that over duplicating an orchestrator.
 See [research and the 30-day plan](docs/RESEARCH.ru.md).

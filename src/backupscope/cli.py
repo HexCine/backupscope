@@ -4,9 +4,10 @@ import sys
 from pathlib import Path
 from . import __version__
 from .catalog import read_catalog
-from .core import analyze, draft_policy
-from .inventory import collect, from_inspect
+from .core import analyze, draft_policy, validate_policy
+from .inventory import collect, from_inspect, validate_inventory
 from .report import html_report, text_report
+from .restic import collect_catalog
 from .validation import InputError, need, read_json
 
 
@@ -42,6 +43,16 @@ def main(argv=None):
     check.add_argument("--at", help="Explicit evaluation time for reproducible fixtures (default: current UTC)")
     check.add_argument("--format", choices=("text", "json", "html"), default="text")
     check.add_argument("--output")
+    verify = sub.add_parser("verify", help="Read one complete snapshot directly from restic, then check it")
+    verify.add_argument("--inventory", required=True)
+    verify.add_argument("--policy", required=True)
+    selection = verify.add_mutually_exclusive_group(required=True)
+    selection.add_argument("--latest", action="store_true", help="Latest snapshot for the policy host and all required tags")
+    selection.add_argument("--snapshot-id", help="Full lowercase 64-character snapshot ID")
+    verify.add_argument("--restic", default="restic", help="Trusted restic executable (default: restic on PATH)")
+    verify.add_argument("--timeout", type=float, default=300, help="Restic timeout in seconds, up to 3600 (default: 300)")
+    verify.add_argument("--format", choices=("text", "json", "html"), default="text")
+    verify.add_argument("--output")
     args = parser.parse_args(argv)
     try:
         if args.command == "inventory":
@@ -53,7 +64,18 @@ def main(argv=None):
         if args.command == "init":
             emit(json.dumps(draft_policy(read_json(args.inventory)), ensure_ascii=False, indent=2) + "\n", args.output)
             return 0
-        report = analyze(read_json(args.inventory), read_catalog(args.snapshot), read_json(args.policy), args.at)
+        inventory, policy = read_json(args.inventory), read_json(args.policy)
+        if args.command == "verify":
+            # Validate local configuration before accessing the configured repository.
+            validate_inventory(inventory)
+            validate_policy(policy)
+            need(inventory["host"] == policy["host"], "Inventory and policy host identities must match")
+            if args.output:
+                need(not Path(args.output).exists() and not Path(args.output).is_symlink(), "Output already exists; choose a new report path")
+            catalog = collect_catalog(policy, args.snapshot_id, args.restic, args.timeout)
+            report = analyze(inventory, catalog, policy)
+        else:
+            report = analyze(inventory, read_catalog(args.snapshot), policy, args.at)
         output = json.dumps(report, ensure_ascii=False, indent=2) + "\n" if args.format == "json" else html_report(report) if args.format == "html" else text_report(report)
         emit(output, args.output)
         return report["exit_code"]

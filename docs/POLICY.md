@@ -91,6 +91,14 @@ requirement failed, such as an old dump, a minimum size or an expired ignore.
 
 ## Bounds and evidence limits
 
+`verify` obtains the unfiltered listing directly and observes restic's exit
+status. `check` still accepts a separately supplied listing. Both run the same
+policy checks. JSON schema 1 has an additive `capture` object: `method` is
+`restic` or `supplied_listing`, with `completion_confirmed` true only for direct
+capture. Direct capture also records `restic_exit_code`, `finished_at` and
+`selection`. This records process completion, not snapshot authenticity or
+file integrity. See [VERIFY.md](VERIFY.md).
+
 JSON inventory/policy files: 8 MiB each. At most 1000 containers, 100 mounts per
 container, 5000 unique resources/rules and 100 required files per rule. Listings:
 128 MiB, 1 MiB per line, 200000 nodes and one million cumulative path segments.

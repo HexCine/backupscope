@@ -6,11 +6,13 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 import venv
 import zipfile
 
 project = Path(__file__).resolve().parents[1]
-wheel = project / 'dist/backupscope-0.1.0-py3-none-any.whl'
+version = tomllib.loads((project / 'pyproject.toml').read_text(encoding='utf-8'))['project']['version']
+wheel = project / f'dist/backupscope-{version}-py3-none-any.whl'
 assert wheel.is_file(), 'Build the wheel first: python -m build'
 with zipfile.ZipFile(wheel) as archive:
     metadata = archive.read(next(n for n in archive.namelist() if n.endswith('/METADATA'))).decode()
@@ -29,7 +31,10 @@ with tempfile.TemporaryDirectory(prefix='backupscope-wheel-') as folder:
     run([binary,'-m','pip','--isolated','install','--no-index','--no-deps','--cache-dir',root/'empty-cache',wheel])
     shutil.copytree(project/'examples',root/'examples')
     run([command,'--version'])
-    run([binary,'-c',"import backupscope; assert backupscope.__version__ == '0.1.0'; assert 'env' in backupscope.__file__"])
+    assert '--latest' in run([command,'verify','--help']).stdout
+    failure = run([command,'verify','--inventory','examples/inventory.json','--policy','examples/policy.json','--latest','--restic',root/'absent-restic'],2)
+    assert not failure.stdout and 'Cannot start restic' in failure.stderr
+    run([binary,'-c',f"import backupscope; assert backupscope.__version__ == {version!r}; assert 'env' in backupscope.__file__"])
     base=[command,'check','--inventory','examples/inventory.json','--policy','examples/policy.json','--at','2026-09-22T13:00:00Z']
     for name, code in [('missing',1),('present',0)]:
         r=run([*base,'--snapshot',f'examples/{name}.jsonl','--format','json'],code)
